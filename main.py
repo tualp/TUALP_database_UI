@@ -2,7 +2,15 @@ import streamlit as st
 import pandas as pd
 import io
 import os
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
+
+try:
+    import matplotlib
+    matplotlib.use('Agg')  # Set the backend to Agg for deployment
+    import matplotlib.pyplot as plt
+except ImportError:
+    st.error("Matplotlib is not installed. Please install it using: pip install matplotlib==3.8.2")
+    st.stop()
 
 # --- 7. Visualization ---
 def plot_pump_curve(df, x_axis, y_axis, legend):
