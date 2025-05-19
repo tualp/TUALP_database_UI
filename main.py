@@ -51,6 +51,17 @@ default_files = {
 db_choice = st.sidebar.selectbox("Select Default Database", list(default_files.keys()))
 uploaded_file = st.sidebar.file_uploader("Upload CSV or Excel", type=["csv", "xlsx"])
 
+# Reset session state when database changes
+if 'previous_db' not in st.session_state:
+    st.session_state['previous_db'] = None
+
+current_db = uploaded_file.name if uploaded_file else db_choice
+if current_db != st.session_state['previous_db']:
+    # Reset all filter selections to "All"
+    for col in ["Test", "Pump", "Case", "TargetRPM", "TargetP_psi"]:
+        st.session_state[f"selected_{col}"] = "All"
+    st.session_state['previous_db'] = current_db
+
 def load_data(file, file_name=None):
     if file is not None:
         if file_name is None:
@@ -74,7 +85,7 @@ else:
     df = load_data(default_files[db_choice])
     st.session_state['data_source'] = db_choice
     st.session_state['db_name'] = db_choice
-
+print(df)
 st.session_state['df'] = df
 
 # --- 5. Data Status Page (Dynamic Cross-Filtering) ---
@@ -113,6 +124,8 @@ st.session_state["selected_Pump"] = selected_pump
 
 # Case filter
 case_options = get_options(filtered_df["Case"])
+print(filtered_df["Case"])
+print(case_options)
 selected_case = st.sidebar.selectbox("Case", case_options, index=case_options.index(st.session_state["selected_Case"]))
 if selected_case != "All":
     filtered_df = filtered_df[filtered_df["Case"] == selected_case]
@@ -145,7 +158,15 @@ with tab1:
         # --- Test Case Info ---
         if 'Comments' in test_data.columns:
             st.write("### Test Case Info")
-            st.write("First Comment:", test_data['Comments'].iloc[0])
+            unique_comments = test_data['Comments'].dropna().unique()
+            if len(unique_comments) > 0:
+                for i, comment in enumerate(unique_comments, 1):
+                    # If there are multiple comments, show only up to first period
+                    if len(unique_comments) > 1:
+                        comment = comment.split('.')[0] + '.'
+                    st.write(f"Test {i}:", comment)
+            else:
+                st.write("No case available")
         st.write("### Test Data")
         st.dataframe(test_data)
 
