@@ -42,25 +42,9 @@ if not st.session_state['logged_in']:
 
 # --- 2. Data Upload & Default Data ---
 st.sidebar.title("Data Source")
-default_files = {
-    "Gas test": "All_pump.csv",
-    "Catalog": "Catalog_All.csv",
-    "Viscosity and emulsion": "df_Viscosity.csv"
-}
 
-db_choice = st.sidebar.selectbox("Select Default Database", list(default_files.keys()))
+# File uploader
 uploaded_file = st.sidebar.file_uploader("Upload CSV or Excel", type=["csv", "xlsx"])
-
-# Reset session state when database changes
-if 'previous_db' not in st.session_state:
-    st.session_state['previous_db'] = None
-
-current_db = uploaded_file.name if uploaded_file else db_choice
-if current_db != st.session_state['previous_db']:
-    # Reset all filter selections to "All"
-    for col in ["Test", "Pump", "Case", "TargetRPM", "TargetP_psi"]:
-        st.session_state[f"selected_{col}"] = "All"
-    st.session_state['previous_db'] = current_db
 
 def load_data(file, file_name=None):
     if file is not None:
@@ -82,10 +66,9 @@ if uploaded_file:
     st.session_state['data_source'] = "User Upload"
     st.session_state['db_name'] = uploaded_file.name
 else:
-    df = load_data(default_files[db_choice])
-    st.session_state['data_source'] = db_choice
-    st.session_state['db_name'] = db_choice
-print(df)
+    st.info("Please upload a CSV or Excel file to begin.")
+    st.stop()
+
 st.session_state['df'] = df
 
 # --- 5. Data Status Page (Dynamic Cross-Filtering) ---

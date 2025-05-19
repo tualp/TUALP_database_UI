@@ -20,11 +20,12 @@ pip install -r requirements.txt
 streamlit run main.py
 ```
 
-## Data Files
-Place your data files in the root directory:
-- All_pump.csv
-- Catalog_All.csv
-- df_Viscosity.csv
+## Usage
+1. Start the application
+2. Upload your CSV or Excel file through the sidebar
+3. Use the filters to analyze your data
+4. Create visualizations using the Data Visualization tab
+5. Export filtered data as needed
 
 ## Login Credentials
 - Username: TUALP
